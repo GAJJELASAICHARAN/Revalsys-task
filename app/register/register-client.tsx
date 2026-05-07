@@ -1,9 +1,10 @@
-import { useState, Suspense } from 'react';
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvex, useConvexAuth } from 'convex/react';
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
