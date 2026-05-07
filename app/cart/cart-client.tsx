@@ -43,7 +43,7 @@ function CartContent() {
           {items.map(item => (
             <div key={item.id} className="bg-white border border-[#ddd] rounded p-4 flex gap-4">
               {/* Image */}
-              <Link href={`/products/${item.id}`} className="flex-shrink-0">
+              <Link href={`/products/${item.productId}`} className="flex-shrink-0">
                 <div className="relative w-24 h-24 sm:w-28 sm:h-28 bg-[#f7f7f7] rounded">
                   <Image
                     src={item.image}
@@ -57,7 +57,7 @@ function CartContent() {
 
               {/* Details */}
               <div className="flex-1 min-w-0">
-                <Link href={`/products/${item.id}`}>
+                <Link href={`/products/${item.productId}`}>
                   <h3 className="font-medium text-[#0f1111] hover:text-[#c45500] line-clamp-2 mb-1">
                     {item.name}
                   </h3>
