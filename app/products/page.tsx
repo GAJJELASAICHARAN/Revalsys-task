@@ -5,9 +5,10 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import ProductCard from '@/components/product-card';
 import { products } from '@/lib/products';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Filter, X, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSearchParams } from 'next/navigation';
 
 const categories = ['laptops', 'smartphones', 'tablets', 'accessories', 'wearables'];
 const priceRanges = [
@@ -23,6 +24,18 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating'>('featured');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Sync selectedCategory with ?category= from the URL (e.g. header nav)
+  useEffect(() => {
+    const urlCategory = searchParams.get('category');
+    if (urlCategory && categories.includes(urlCategory)) {
+      setSelectedCategory(urlCategory);
+    } else if (!urlCategory) {
+      // Only reset when the param is absent, so in-page filters still work.
+      setSelectedCategory(null);
+    }
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     let result = [...products];
