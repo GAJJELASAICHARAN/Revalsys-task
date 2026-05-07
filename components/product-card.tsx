@@ -11,6 +11,12 @@ import { useState } from 'react';
 
 interface ProductCardProps {
   product: Product;
+  /**
+   * When true, adding the product to the cart will also remove it from the
+   * user's wishlist. Useful on the wishlist page so items move (not duplicate)
+   * into the cart.
+   */
+  removeFromWishlistOnAdd?: boolean;
 }
 
 const badgeColors: Record<string, string> = {
@@ -19,7 +25,7 @@ const badgeColors: Record<string, string> = {
   New: 'bg-[#007600] text-white',
 };
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, removeFromWishlistOnAdd = false }: ProductCardProps) {
   const { addItem } = useCart();
   const [isAdded, setIsAdded] = useState(false);
   const [localWish, setLocalWish] = useState(false); // guest fallback
@@ -30,6 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     isAuthenticated ? { productId: product.id } : 'skip'
   );
   const toggleWishlist = useMutation(api.wishlist.toggle);
+  const removeWishlist = useMutation(api.wishlist.remove);
 
   const wishlisted = isAuthenticated ? !!isWishlisted : localWish;
 
@@ -51,6 +58,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       quantity: 1,
       image: product.image,
     });
+    if (removeFromWishlistOnAdd && isAuthenticated) {
+      removeWishlist({ productId: product.id }).catch(() => {});
+    } else if (removeFromWishlistOnAdd) {
+      setLocalWish(false);
+    }
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
   };

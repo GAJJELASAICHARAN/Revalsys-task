@@ -52,3 +52,25 @@ export const toggle = mutation({
     }
   },
 });
+
+// Removes a product from the wishlist if present (no-op otherwise).
+export const remove = mutation({
+  args: { productId: v.string() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return false;
+
+    const existing = await ctx.db
+      .query("wishlist")
+      .withIndex("by_user_product", (q) =>
+        q.eq("userId", userId).eq("productId", args.productId)
+      )
+      .first();
+
+    if (existing) {
+      await ctx.db.delete(existing._id);
+      return true;
+    }
+    return false;
+  },
+});
