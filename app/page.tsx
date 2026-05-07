@@ -1,22 +1,29 @@
+import type { Metadata } from 'next';
 import Header from '@/components/header';
 import HeroSection from '@/components/hero-section';
 import FeaturedProducts from '@/components/featured-products';
 import Categories from '@/components/categories';
 import AIRecommendations from '@/components/ai-recommendations';
 import Footer from '@/components/footer';
-import { CartProvider } from '@/lib/cart-context';
+
+export const metadata: Metadata = {
+  title: 'TechHub — Shop Electronics, Laptops, Phones & More',
+  description: 'Shop premium electronics at TechHub. Discover laptops, smartphones, tablets, wearables and accessories with AI-powered recommendations, fast free shipping, and 30-day returns.',
+};
 
 export default function Home() {
   return (
-    <CartProvider>
+    <>
       <Header />
-      <main className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/5">
+      <main className="min-h-screen bg-[#f3f3f3]">
         <HeroSection />
-        <FeaturedProducts />
-        <AIRecommendations />
-        <Categories />
+        <div className="bg-white">
+          <FeaturedProducts />
+          <AIRecommendations />
+          <Categories />
+        </div>
       </main>
       <Footer />
-    </CartProvider>
+    </>
   );
 }

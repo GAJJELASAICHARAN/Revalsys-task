@@ -1,31 +1,30 @@
 'use client';
 
+import type { Metadata } from 'next';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
-import { CartProvider, useCart } from '@/lib/cart-context';
+import { useCart } from '@/lib/cart-context';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
+import { Trash2, ArrowRight, ShoppingBag, Shield, Truck, RotateCcw } from 'lucide-react';
 
 function CartContent() {
   const { items, removeItem, updateQuantity, totalPrice, clearCart } = useCart();
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-6">
-          <div className="flex justify-center">
-            <ShoppingBag className="w-16 h-16 text-muted-foreground" />
-          </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-5">
+          <ShoppingBag className="w-16 h-16 text-[#aaa] mx-auto" />
           <div>
-            <h1 className="text-2xl font-bold text-foreground mb-2">Your cart is empty</h1>
-            <p className="text-muted-foreground mb-6">
-              Discover our amazing products and add them to your cart.
+            <h1 className="text-2xl font-bold text-[#0f1111] mb-2">Your TechHub Cart is empty</h1>
+            <p className="text-[#565959] mb-6">
+              Your shopping cart lives here. Add items and they&apos;ll show up here.
             </p>
             <Link href="/products">
-              <Button size="lg">
-                Start Shopping
+              <Button className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] font-semibold border border-[#FCD200]">
+                Shop today&apos;s deals
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Link>
@@ -36,141 +35,133 @@ function CartContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 sm:py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Shopping Cart</h1>
-          <p className="text-muted-foreground">
-            You have {items.length} {items.length === 1 ? 'item' : 'items'} in your cart
-          </p>
-        </div>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-3xl font-normal text-[#0f1111] mb-6">Shopping Cart</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
-            {items.map(item => (
-              <div
-                key={item.id}
-                className="bg-card border border-border rounded-lg p-4 flex gap-4 sm:gap-6"
-              >
-                {/* Image */}
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Cart Items */}
+        <div className="lg:col-span-3 space-y-4">
+          {items.map(item => (
+            <div key={item.id} className="bg-white border border-[#ddd] rounded p-4 flex gap-4">
+              {/* Image */}
+              <Link href={`/products/${item.id}`} className="flex-shrink-0">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 bg-[#f7f7f7] rounded">
                   <Image
                     src={item.image}
                     alt={item.name}
                     fill
-                    className="object-cover"
+                    className="object-contain p-2"
                     crossOrigin="anonymous"
                   />
                 </div>
-
-                {/* Details */}
-                <div className="flex-1 flex flex-col">
-                  <div className="flex-1">
-                    <Link href={`/products/${item.id}`} className="hover:text-primary transition-colors">
-                      <h3 className="font-semibold text-foreground mb-1">{item.name}</h3>
-                    </Link>
-                    <p className="text-lg font-bold text-primary">
-                      ${item.price.toLocaleString()}
-                    </p>
-                  </div>
-
-                  {/* Quantity Controls and Remove */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="p-1.5 hover:bg-secondary/10 rounded-lg transition-colors"
-                      >
-                        −
-                      </button>
-                      <span className="w-6 text-center font-semibold text-foreground">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-1.5 hover:bg-secondary/10 rounded-lg transition-colors"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="p-2 hover:bg-destructive/10 rounded-lg text-destructive transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-card border border-border rounded-lg p-6 space-y-6 sticky top-20">
-              <div>
-                <h2 className="text-xl font-bold text-foreground mb-4">Order Summary</h2>
-                <div className="space-y-3">
-                  {/* Subtotal */}
-                  <div className="flex justify-between text-foreground">
-                    <span>Subtotal</span>
-                    <span>${totalPrice.toLocaleString()}</span>
-                  </div>
-
-                  {/* Shipping */}
-                  <div className="flex justify-between text-foreground">
-                    <span>Shipping</span>
-                    <span className="text-green-600 font-medium">Free</span>
-                  </div>
-
-                  {/* Tax */}
-                  <div className="flex justify-between text-foreground">
-                    <span>Estimated Tax</span>
-                    <span>${(totalPrice * 0.08).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="border-t border-border my-2" />
-
-                  {/* Total */}
-                  <div className="flex justify-between text-lg font-bold text-foreground">
-                    <span>Total</span>
-                    <span className="text-primary">
-                      ${(totalPrice * 1.08).toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Checkout Button */}
-              <Button className="w-full" size="lg">
-                Proceed to Checkout
-              </Button>
-
-              {/* Continue Shopping */}
-              <Link href="/products">
-                <Button variant="outline" className="w-full">
-                  Continue Shopping
-                </Button>
               </Link>
 
-              {/* Clear Cart */}
-              <button
-                onClick={clearCart}
-                className="w-full text-sm text-destructive hover:text-destructive/80 transition-colors font-medium"
-              >
-                Clear Cart
-              </button>
+              {/* Details */}
+              <div className="flex-1 min-w-0">
+                <Link href={`/products/${item.id}`}>
+                  <h3 className="font-medium text-[#0f1111] hover:text-[#c45500] line-clamp-2 mb-1">
+                    {item.name}
+                  </h3>
+                </Link>
+                <p className="text-xs text-[#007600] mb-2">In Stock</p>
+                <p className="text-xl font-semibold text-[#0f1111] mb-3">
+                  ${item.price.toLocaleString()}
+                </p>
 
-              {/* Trust Info */}
-              <div className="pt-4 border-t border-border space-y-2 text-xs text-muted-foreground">
-                <p>✓ Secure checkout with SSL encryption</p>
-                <p>✓ 30-day money-back guarantee</p>
-                <p>✓ Free shipping on orders over $50</p>
+                <div className="flex items-center gap-4 flex-wrap">
+                  {/* Quantity */}
+                  <div className="flex items-center border border-[#ddd] rounded">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      className="px-3 py-1.5 text-sm hover:bg-[#f0f2f2] transition-colors border-r border-[#ddd]"
+                    >
+                      −
+                    </button>
+                    <span className="px-4 py-1.5 text-sm font-semibold text-[#0f1111]">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="px-3 py-1.5 text-sm hover:bg-[#f0f2f2] transition-colors border-l border-[#ddd]"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <span className="text-[#ddd]">|</span>
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="text-sm text-[#0066c0] hover:text-[#c45500] hover:underline flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Delete
+                  </button>
+                  <button className="text-sm text-[#0066c0] hover:text-[#c45500] hover:underline">
+                    Save for later
+                  </button>
+                </div>
+              </div>
+
+              {/* Line total */}
+              <div className="hidden sm:block flex-shrink-0 text-right">
+                <p className="font-bold text-[#0f1111]">
+                  ${(item.price * item.quantity).toLocaleString()}
+                </p>
               </div>
             </div>
+          ))}
+
+          {/* Subtotal at bottom of list */}
+          <div className="text-right pr-4">
+            <span className="text-lg text-[#0f1111]">
+              Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items):{' '}
+              <strong>${totalPrice.toLocaleString()}</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* Order Summary */}
+        <div className="lg:col-span-1">
+          <div className="bg-white border border-[#ddd] rounded p-5 sticky top-20 space-y-4">
+            {/* Free delivery */}
+            <div className="text-sm text-[#007600] font-semibold">
+              ✓ Your order qualifies for FREE delivery.
+            </div>
+
+            <div className="border-t border-[#e7e7e7] pt-4">
+              <p className="text-lg text-[#0f1111] mb-1">
+                Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items):{' '}
+                <strong>${totalPrice.toLocaleString()}</strong>
+              </p>
+              <p className="text-xs text-[#565959] mb-4">
+                Estimated tax: ${(totalPrice * 0.08).toLocaleString('en-US', { maximumFractionDigits: 2 })}
+              </p>
+              <Button className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] font-semibold border border-[#FCD200] rounded-sm">
+                Proceed to checkout
+              </Button>
+            </div>
+
+            {/* Trust badges */}
+            <div className="border-t border-[#e7e7e7] pt-4 space-y-2 text-xs text-[#565959]">
+              <div className="flex items-center gap-2">
+                <Shield className="w-3.5 h-3.5 text-[#565959]" />
+                Secure checkout with SSL
+              </div>
+              <div className="flex items-center gap-2">
+                <Truck className="w-3.5 h-3.5 text-[#565959]" />
+                Free shipping on orders over $50
+              </div>
+              <div className="flex items-center gap-2">
+                <RotateCcw className="w-3.5 h-3.5 text-[#565959]" />
+                30-day return guarantee
+              </div>
+            </div>
+
+            <button
+              onClick={clearCart}
+              className="w-full text-xs text-[#cc0c39] hover:underline"
+            >
+              Clear cart
+            </button>
           </div>
         </div>
       </div>
@@ -180,10 +171,12 @@ function CartContent() {
 
 export default function CartPage() {
   return (
-    <CartProvider>
+    <>
       <Header />
-      <CartContent />
+      <main className="min-h-screen bg-[#f3f3f3]">
+        <CartContent />
+      </main>
       <Footer />
-    </CartProvider>
+    </>
   );
 }

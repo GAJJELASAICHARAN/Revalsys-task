@@ -1,20 +1,20 @@
 'use client';
 
+import type { Metadata } from 'next';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import ProductCard from '@/components/product-card';
-import { products, Product } from '@/lib/products';
-import { CartProvider } from '@/lib/cart-context';
+import { products } from '@/lib/products';
 import { useState, useMemo } from 'react';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const categories = ['laptops', 'smartphones', 'tablets', 'accessories', 'wearables'];
 const priceRanges = [
   { label: 'Under $500', min: 0, max: 500 },
-  { label: '$500 - $1000', min: 500, max: 1000 },
-  { label: '$1000 - $2000', min: 1000, max: 2000 },
-  { label: 'Over $2000', min: 2000, max: Infinity },
+  { label: '$500 – $1,000', min: 500, max: 1000 },
+  { label: '$1,000 – $2,000', min: 1000, max: 2000 },
+  { label: 'Over $2,000', min: 2000, max: Infinity },
 ];
 
 export default function ProductsPage() {
@@ -24,218 +24,179 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const filteredAndSortedProducts = useMemo(() => {
+  const filtered = useMemo(() => {
     let result = [...products];
-
-    // Filter by search
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query)
-      );
-    }
-
-    // Filter by category
-    if (selectedCategory) {
-      result = result.filter(p => p.category === selectedCategory);
-    }
-
-    // Filter by price
-    if (selectedPrice) {
+      const q = searchQuery.toLowerCase();
       result = result.filter(
-        p => p.price >= selectedPrice.min && p.price <= selectedPrice.max
+        p =>
+          p.name.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          p.category.includes(q)
       );
     }
-
-    // Sort
+    if (selectedCategory) result = result.filter(p => p.category === selectedCategory);
+    if (selectedPrice) result = result.filter(p => p.price >= selectedPrice.min && p.price <= selectedPrice.max);
     switch (sortBy) {
-      case 'price-low':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        result.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'featured':
-      default:
-        result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+      case 'price-low': result.sort((a, b) => a.price - b.price); break;
+      case 'price-high': result.sort((a, b) => b.price - a.price); break;
+      case 'rating': result.sort((a, b) => b.rating - a.rating); break;
+      default: result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
     }
-
     return result;
   }, [selectedCategory, selectedPrice, sortBy, searchQuery]);
 
+  const clearAll = () => {
+    setSelectedCategory(null);
+    setSelectedPrice(null);
+    setSearchQuery('');
+  };
+
   return (
-    <CartProvider>
+    <>
       <Header />
-      <main className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">All Products</h1>
-            <p className="text-muted-foreground">
-              Browse our complete collection of electronics
+      <main className="min-h-screen bg-[#f3f3f3]">
+        {/* Page title bar */}
+        <div className="bg-white border-b border-[#ddd] px-4 py-4">
+          <div className="container mx-auto">
+            <h1 className="text-2xl font-bold text-[#0f1111]">
+              {selectedCategory ? `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}` : 'All Electronics'}
+            </h1>
+            <p className="text-sm text-[#565959] mt-1">
+              {filtered.length} result{filtered.length !== 1 ? 's' : ''} for &quot;{selectedCategory || 'electronics'}&quot;
             </p>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar Filters */}
-            <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block space-y-6`}>
-              <div className="flex items-center justify-between lg:hidden mb-4">
-                <h3 className="font-semibold text-lg">Filters</h3>
-                <button onClick={() => setIsFilterOpen(false)}>
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Search */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Search
-                </label>
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              {/* Category Filter */}
-              <div>
-                <h3 className="font-semibold text-foreground mb-3">Category</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedCategory(null)}
-                    className={`block w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                      selectedCategory === null
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-secondary/10'
-                    }`}
-                  >
-                    All Categories
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex gap-5">
+            {/* Sidebar */}
+            <aside className={`${isFilterOpen ? 'fixed inset-0 z-40 bg-white overflow-auto' : 'hidden'} lg:block lg:static lg:z-auto lg:bg-transparent w-full lg:w-56 flex-shrink-0`}>
+              <div className="lg:sticky lg:top-20 space-y-5 p-4 lg:p-0">
+                {/* Mobile close */}
+                <div className="flex items-center justify-between lg:hidden">
+                  <h2 className="text-lg font-bold text-[#0f1111]">Filters</h2>
+                  <button onClick={() => setIsFilterOpen(false)}>
+                    <X className="w-5 h-5" />
                   </button>
-                  {categories.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`block w-full text-left px-3 py-2 rounded-lg transition-colors capitalize ${
-                        selectedCategory === cat
-                          ? 'bg-primary text-primary-foreground'
-                          : 'hover:bg-secondary/10'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
                 </div>
-              </div>
 
-              {/* Price Filter */}
-              <div>
-                <h3 className="font-semibold text-foreground mb-3">Price</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedPrice(null)}
-                    className={`block w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                      selectedPrice === null
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-secondary/10'
-                    }`}
-                  >
-                    All Prices
+                {/* Search */}
+                <div>
+                  <h3 className="text-sm font-bold text-[#0f1111] mb-2">Search</h3>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="w-full px-2.5 py-1.5 border border-[#a6a6a6] rounded-sm text-sm focus:outline-none focus:border-[#e77600]"
+                  />
+                </div>
+
+                {/* Department */}
+                <div>
+                  <h3 className="text-sm font-bold text-[#0f1111] mb-2">Department</h3>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className={`block w-full text-left text-sm px-0 py-0.5 ${selectedCategory === null ? 'font-bold text-[#c45500]' : 'text-[#0066c0] hover:text-[#c45500] hover:underline'}`}
+                    >
+                      All Electronics
+                    </button>
+                    {categories.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`block w-full text-left text-sm px-0 py-0.5 capitalize ${selectedCategory === cat ? 'font-bold text-[#c45500]' : 'text-[#0066c0] hover:text-[#c45500] hover:underline'}`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div>
+                  <h3 className="text-sm font-bold text-[#0f1111] mb-2">Price</h3>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => setSelectedPrice(null)}
+                      className={`block w-full text-left text-sm px-0 py-0.5 ${selectedPrice === null ? 'font-bold text-[#c45500]' : 'text-[#0066c0] hover:text-[#c45500] hover:underline'}`}
+                    >
+                      All Prices
+                    </button>
+                    {priceRanges.map((range, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedPrice(range)}
+                        className={`block w-full text-left text-sm px-0 py-0.5 ${selectedPrice === range ? 'font-bold text-[#c45500]' : 'text-[#0066c0] hover:text-[#c45500] hover:underline'}`}
+                      >
+                        {range.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {(selectedCategory || selectedPrice || searchQuery) && (
+                  <button onClick={clearAll} className="text-sm text-[#0066c0] hover:text-[#c45500] hover:underline">
+                    Clear all filters
                   </button>
-                  {priceRanges.map((range, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedPrice(range)}
-                      className={`block w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                        selectedPrice === range
-                          ? 'bg-primary text-primary-foreground'
-                          : 'hover:bg-secondary/10'
-                      }`}
-                    >
-                      {range.label}
-                    </button>
-                  ))}
-                </div>
+                )}
               </div>
+            </aside>
 
-              {/* Clear Filters */}
-              {(selectedCategory || selectedPrice || searchQuery) && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedCategory(null);
-                    setSelectedPrice(null);
-                    setSearchQuery('');
-                  }}
-                  className="w-full"
-                >
-                  Clear Filters
-                </Button>
-              )}
-            </div>
-
-            {/* Products Grid */}
-            <div className="lg:col-span-3">
-              {/* Top Bar */}
-              <div className="flex items-center justify-between mb-6">
-                <p className="text-sm text-muted-foreground">
-                  Showing {filteredAndSortedProducts.length} products
-                </p>
-                <div className="flex gap-2">
+            {/* Products */}
+            <div className="flex-1 min-w-0">
+              {/* Sort bar */}
+              <div className="bg-[#eaf4fe] border border-[#bcd5eb] rounded px-4 py-2 flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsFilterOpen(true)}
-                    className="lg:hidden p-2 border border-border rounded-lg hover:bg-secondary/10"
+                    className="lg:hidden flex items-center gap-1.5 text-sm text-[#0f1111] font-medium"
                   >
-                    <Filter className="w-5 h-5" />
+                    <SlidersHorizontal className="w-4 h-4" />
+                    Filters
                   </button>
+                  <span className="text-sm text-[#0f1111]">
+                    {filtered.length} results
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-[#0f1111] font-medium whitespace-nowrap">Sort by:</label>
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
-                    className="px-3 py-2 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    onChange={e => setSortBy(e.target.value as typeof sortBy)}
+                    className="text-sm border border-[#a6a6a6] rounded-sm px-2 py-1 bg-white focus:outline-none focus:border-[#e77600]"
                   >
                     <option value="featured">Featured</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
-                    <option value="rating">Highest Rated</option>
+                    <option value="rating">Avg. Customer Review</option>
                   </select>
                 </div>
               </div>
 
-              {/* Products Grid */}
-              {filteredAndSortedProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredAndSortedProducts.map(product => (
-                    <ProductCard key={product.id} product={product} />
+              {filtered.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {filtered.map(p => (
+                    <ProductCard key={p.id} product={p} />
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <p className="text-lg font-semibold text-foreground mb-2">No products found</p>
-                  <p className="text-muted-foreground mb-6">
-                    Try adjusting your filters or search query
-                  </p>
-                  <Button
-                    onClick={() => {
-                      setSelectedCategory(null);
-                      setSelectedPrice(null);
-                      setSearchQuery('');
-                    }}
-                  >
-                    Clear Filters
+                <div className="text-center py-16">
+                  <Filter className="w-12 h-12 text-[#aaa] mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-[#0f1111] mb-2">No results found</h2>
+                  <p className="text-[#565959] mb-4">Try adjusting your filters or search terms.</p>
+                  <Button onClick={clearAll} className="bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] border border-[#FCD200]">
+                    Clear all filters
                   </Button>
                 </div>
               )}
             </div>
           </div>
         </div>
-      </div>
+      </main>
       <Footer />
-    </CartProvider>
+    </>
   );
 }

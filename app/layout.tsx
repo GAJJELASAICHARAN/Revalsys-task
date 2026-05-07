@@ -1,30 +1,29 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { AuthProvider } from '@/lib/auth-context'
+import { CartProvider } from '@/lib/cart-context'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'TechHub - Electronics Showcase',
-  description: 'Discover the latest electronics with AI-powered recommendations',
-  generator: 'v0.app',
+  title: {
+    default: 'TechHub — Shop Electronics, Laptops, Phones & More',
+    template: '%s | TechHub',
+  },
+  description: 'Shop premium electronics at TechHub. Discover laptops, smartphones, tablets, wearables and accessories with AI-powered recommendations, fast free shipping, and 30-day returns.',
+  keywords: ['electronics', 'laptops', 'smartphones', 'tablets', 'wearables', 'tech deals'],
+  openGraph: {
+    type: 'website',
+    siteName: 'TechHub',
+    title: 'TechHub — Shop Electronics, Laptops, Phones & More',
+    description: 'Shop premium electronics with AI-powered recommendations and fast free shipping.',
+  },
+  robots: { index: true, follow: true },
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
+    icon: '/icon.svg',
     apple: '/apple-icon.png',
   },
 }
@@ -37,7 +36,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-background">
       <body className="font-sans antialiased bg-background">
-        {children}
+        <AuthProvider>
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

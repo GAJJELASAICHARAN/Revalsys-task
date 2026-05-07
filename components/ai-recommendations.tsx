@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/product-card';
 import { getProductsByPerformance, getTrendingProducts } from '@/lib/ai-utils';
 import { Sparkles, TrendingUp, Award, Heart } from 'lucide-react';
@@ -30,33 +29,26 @@ export default function AIRecommendations() {
   };
 
   return (
-    <section className="py-16 sm:py-24 px-4 bg-gradient-to-b from-transparent via-secondary/5 to-transparent">
+    <section className="py-8 px-4 border-b border-[#e7e7e7]">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between mb-12">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">AI-Powered</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-              Smart Recommendations
-            </h2>
-            <p className="text-muted-foreground">
-              Discover products tailored to your interests
-            </p>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FF9900]/10 border border-[#FF9900]/30">
+            <Sparkles className="w-3.5 h-3.5 text-[#FF9900]" />
+            <span className="text-xs font-semibold text-[#FF9900]">AI-Powered</span>
           </div>
+          <h2 className="text-xl font-bold text-[#0f1111]">Smart Recommendations</h2>
         </div>
 
         {/* Toggle Buttons */}
-        <div className="flex gap-3 mb-8 flex-wrap">
+        <div className="flex gap-2 mb-5 flex-wrap">
           {(Object.keys(labels) as RecommendationType[]).map(type => (
             <button
               key={type}
               onClick={() => setActiveType(type)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-sm border transition-colors ${
                 activeType === type
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-card border border-border hover:border-primary/50'
+                  ? 'bg-[#232F3E] text-white border-[#232F3E]'
+                  : 'bg-white border-[#ddd] text-[#0f1111] hover:border-[#FF9900]'
               }`}
             >
               {icons[type]}
@@ -66,11 +58,9 @@ export default function AIRecommendations() {
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {recommendations[activeType].map(product => (
-            <div key={product.id} className="lg:col-span-2">
-              <ProductCard product={product} />
-            </div>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>

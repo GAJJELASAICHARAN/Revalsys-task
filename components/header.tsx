@@ -4,15 +4,28 @@ import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart-context';
-import { Button } from '@/components/ui/button';
-import { ShoppingCart, Search, Menu, X, Sparkles } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
+import { ShoppingCart, Search, Menu, X, ChevronDown, MapPin } from 'lucide-react';
+
+const categories = [
+  { label: 'All Electronics', href: '/products' },
+  { label: 'Laptops', href: '/products?category=laptops' },
+  { label: 'Smartphones', href: '/products?category=smartphones' },
+  { label: 'Tablets', href: '/products?category=tablets' },
+  { label: 'Wearables', href: '/products?category=wearables' },
+  { label: 'Accessories', href: '/products?category=accessories' },
+  { label: "Today's Deals", href: '/deals' },
+];
 
 export default function Header() {
   const { totalItems } = useCart();
+  const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,93 +35,228 @@ export default function Header() {
     }
   };
 
+  const firstName = user && !user.isGuest ? user.name.split(' ')[0] : null;
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
-              <span className="text-lg font-bold text-primary-foreground">T</span>
-            </div>
-            <span className="font-bold text-lg hidden sm:inline">TechHub</span>
-          </Link>
+    <header className="sticky top-0 z-50 w-full">
+      {/* Main nav bar — Amazon dark */}
+      <div className="bg-[#131921]">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-center gap-2 h-[60px]">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex-shrink-0 flex items-center gap-1 border border-transparent hover:border-white rounded px-2 py-1 transition-colors"
+            >
+              <span className="text-white font-bold text-xl leading-none">Tech</span>
+              <span className="text-[#FF9900] font-bold text-xl leading-none">Hub</span>
+            </Link>
 
-          {/* Navigation - Desktop */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors">
-              Products
+            {/* Deliver to */}
+            <Link
+              href="#"
+              className="hidden lg:flex flex-col items-start border border-transparent hover:border-white rounded px-2 py-1 transition-colors flex-shrink-0"
+            >
+              <span className="text-[#ccc] text-[10px] leading-none">Deliver to</span>
+              <div className="flex items-center gap-0.5 mt-0.5">
+                <MapPin className="w-3.5 h-3.5 text-white" />
+                <span className="text-white text-xs font-bold">United States</span>
+              </div>
             </Link>
-            <Link href="/deals" className="text-sm font-medium hover:text-primary transition-colors">
-              Deals
-            </Link>
-            <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
-              About
-            </Link>
-          </nav>
 
-          {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-xs mx-8">
-            <div className="flex items-center w-full px-4 py-2 rounded-lg border border-border bg-card focus-within:border-primary/50 transition-colors">
-              <Search className="w-4 h-4 text-muted-foreground mr-2" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent outline-none text-foreground placeholder-muted-foreground"
-              />
-              {searchQuery && (
-                <div className="flex items-center gap-1 ml-2">
-                  <Sparkles className="w-3 h-3 text-primary" />
-                  <span className="text-xs text-primary font-medium">AI</span>
+            {/* Search bar */}
+            <form onSubmit={handleSearch} className="flex-1 flex min-w-0">
+              <div className="flex w-full rounded overflow-hidden">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search TechHub"
+                  className="flex-1 h-10 px-3 text-sm text-[#0f1111] bg-white focus:outline-none min-w-0"
+                />
+                <button
+                  type="submit"
+                  className="h-10 w-10 sm:w-12 bg-[#FF9900] hover:bg-[#e88c00] flex items-center justify-center flex-shrink-0 transition-colors"
+                >
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#131921]" />
+                </button>
+              </div>
+            </form>
+
+            {/* Account */}
+            <div
+              className="relative hidden sm:block flex-shrink-0"
+              ref={userMenuRef}
+              onMouseEnter={() => setShowUserMenu(true)}
+              onMouseLeave={() => setShowUserMenu(false)}
+            >
+              <Link
+                href={user ? '#' : '/login'}
+                className="flex flex-col items-start border border-transparent hover:border-white rounded px-2 py-1 transition-colors"
+                onClick={e => user && e.preventDefault()}
+              >
+                <span className="text-[#ccc] text-[10px] leading-none">
+                  {firstName ? `Hello, ${firstName}` : user?.isGuest ? 'Hello, Guest' : 'Hello, sign in'}
+                </span>
+                <div className="flex items-center gap-0.5">
+                  <span className="text-white text-xs font-bold">Account & Lists</span>
+                  <ChevronDown className="w-3 h-3 text-white" />
+                </div>
+              </Link>
+
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-0 w-56 bg-white border border-[#ddd] shadow-lg rounded z-50">
+                  <div className="p-4 border-b border-[#e7e7e7]">
+                    {user ? (
+                      <p className="text-sm font-semibold text-[#0f1111]">
+                        {user.isGuest ? 'Shopping as Guest' : `Hi, ${user.name}`}
+                      </p>
+                    ) : (
+                      <>
+                        <Link href="/login">
+                          <button className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] text-sm font-semibold border border-[#FCD200] rounded py-1.5 px-3">
+                            Sign in
+                          </button>
+                        </Link>
+                        <p className="text-xs text-[#565959] mt-2 text-center">
+                          New customer?{' '}
+                          <Link href="/register" className="text-[#0066c0] hover:underline">
+                            Start here
+                          </Link>
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  <div className="py-2">
+                    <p className="px-4 py-1 text-xs font-bold text-[#0f1111] uppercase">Your Account</p>
+                    <Link href="#" className="block px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]">Your Orders</Link>
+                    <Link href="#" className="block px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]">Your Wishlist</Link>
+                    <Link href="/contact" className="block px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]">Contact Support</Link>
+                    {user && (
+                      <button
+                        onClick={() => { logout(); setShowUserMenu(false); }}
+                        className="block w-full text-left px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]"
+                      >
+                        Sign Out
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-          </form>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link href="/search" className="p-2 hover:bg-secondary/10 rounded-lg transition-colors md:hidden">
-              <Search className="w-5 h-5 text-foreground" />
+            {/* Returns & Orders */}
+            <Link
+              href="#"
+              className="hidden md:flex flex-col items-start border border-transparent hover:border-white rounded px-2 py-1 transition-colors flex-shrink-0"
+            >
+              <span className="text-[#ccc] text-[10px] leading-none">Returns</span>
+              <span className="text-white text-xs font-bold">& Orders</span>
             </Link>
-            <Link href="/cart">
-              <Button variant="outline" size="icon" className="relative">
-                <ShoppingCart className="w-5 h-5" />
+
+            {/* Cart */}
+            <Link
+              href="/cart"
+              className="flex items-end gap-1 border border-transparent hover:border-white rounded px-2 py-1 transition-colors flex-shrink-0"
+            >
+              <div className="relative">
+                <ShoppingCart className="w-7 h-7 text-white" />
                 {totalItems > 0 && (
-                  <span className="absolute top-0 right-0 -mr-2 -mt-2 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                    {totalItems}
+                  <span className="absolute -top-2 -right-1 bg-[#FF9900] text-[#131921] text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalItems > 99 ? '99+' : totalItems}
                   </span>
                 )}
-              </Button>
+              </div>
+              <span className="text-white text-xs font-bold hidden sm:inline">Cart</span>
             </Link>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile menu toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 hover:bg-secondary/10 rounded-lg"
+              className="md:hidden p-2 border border-transparent hover:border-white rounded transition-colors"
             >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMenuOpen ? (
+                <X className="w-5 h-5 text-white" />
+              ) : (
+                <Menu className="w-5 h-5 text-white" />
+              )}
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <nav className="md:hidden pb-4 border-t border-border">
-            <Link href="/products" className="block px-2 py-2 text-sm font-medium hover:text-primary">
-              Products
-            </Link>
-            <Link href="/deals" className="block px-2 py-2 text-sm font-medium hover:text-primary">
-              Deals
-            </Link>
-            <Link href="/about" className="block px-2 py-2 text-sm font-medium hover:text-primary">
-              About
-            </Link>
-          </nav>
-        )}
       </div>
+
+      {/* Category nav bar */}
+      <div className="bg-[#232F3E]">
+        <div className="container mx-auto px-3 sm:px-4 hidden md:flex items-center gap-1 h-10 overflow-x-auto">
+          {categories.map(cat => (
+            <Link
+              key={cat.href}
+              href={cat.href}
+              className="flex-shrink-0 text-white text-xs px-3 py-1.5 rounded border border-transparent hover:border-white transition-colors whitespace-nowrap"
+            >
+              {cat.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-[#232F3E] border-t border-[#3a4553]">
+          {/* Mobile search */}
+          <div className="p-3">
+            <form onSubmit={handleSearch} className="flex">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search TechHub"
+                className="flex-1 h-9 px-3 text-sm text-[#0f1111] bg-white rounded-l focus:outline-none"
+              />
+              <button type="submit" className="h-9 w-10 bg-[#FF9900] flex items-center justify-center rounded-r">
+                <Search className="w-4 h-4 text-[#131921]" />
+              </button>
+            </form>
+          </div>
+
+          {/* Mobile auth */}
+          <div className="px-3 pb-2">
+            {user ? (
+              <div className="text-white text-sm py-2 px-3 border-b border-[#3a4553]">
+                {user.isGuest ? 'Shopping as Guest' : `Hello, ${user.name}`}
+              </div>
+            ) : (
+              <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                <div className="text-white text-sm py-2 px-3 border-b border-[#3a4553] font-semibold">
+                  Sign in / Create account
+                </div>
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile category links */}
+          {categories.map(cat => (
+            <Link
+              key={cat.href}
+              href={cat.href}
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-4 py-2.5 text-white text-sm border-b border-[#3a4553] hover:bg-[#3a4553] transition-colors"
+            >
+              {cat.label}
+            </Link>
+          ))}
+
+          {user && (
+            <button
+              onClick={() => { logout(); setIsMenuOpen(false); }}
+              className="block w-full text-left px-4 py-2.5 text-white text-sm border-b border-[#3a4553] hover:bg-[#3a4553] transition-colors"
+            >
+              Sign Out
+            </button>
+          )}
+        </div>
+      )}
     </header>
   );
 }

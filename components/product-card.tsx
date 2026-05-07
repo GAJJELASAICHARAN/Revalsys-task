@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/products';
-import { Button } from '@/components/ui/button';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
@@ -11,6 +10,12 @@ import { useCart } from '@/lib/cart-context';
 interface ProductCardProps {
   product: Product;
 }
+
+const badgeColors: Record<string, string> = {
+  'Best Seller': 'bg-[#FF9900] text-white',
+  Deal: 'bg-red-600 text-white',
+  New: 'bg-[#007600] text-white',
+};
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -30,102 +35,121 @@ export default function ProductCard({ product }: ProductCardProps) {
     setTimeout(() => setIsAdded(false), 2000);
   };
 
+  const discount =
+    product.originalPrice
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : null;
+
   return (
     <Link href={`/products/${product.id}`}>
-      <div className="group bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 h-full flex flex-col hover:shadow-lg hover:shadow-primary/10">
-        {/* Image Container */}
-        <div className="relative overflow-hidden bg-muted h-64 sm:h-56 lg:h-64">
+      <div className="group bg-white border border-[#ddd] hover:border-[#FF9900] hover:shadow-md transition-all duration-200 rounded h-full flex flex-col">
+        {/* Image */}
+        <div className="relative overflow-hidden bg-[#f7f7f7] h-52 sm:h-48 lg:h-52 rounded-t flex-shrink-0">
           <Image
             src={product.image}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-300"
+            className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
             crossOrigin="anonymous"
           />
-          
+
           {!product.inStock && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <span className="text-white font-semibold">Out of Stock</span>
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+              <span className="text-[#cc0c39] font-semibold text-sm">Out of Stock</span>
             </div>
           )}
 
-          {/* Wishlist Button */}
+          {/* Badge */}
+          {product.badge && (
+            <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded ${badgeColors[product.badge] ?? 'bg-gray-600 text-white'}`}>
+              {product.badge}
+            </span>
+          )}
+
+          {/* Discount % */}
+          {discount && (
+            <span className="absolute top-2 right-2 text-[10px] font-bold bg-[#cc0c39] text-white px-1.5 py-0.5 rounded">
+              -{discount}%
+            </span>
+          )}
+
+          {/* Wishlist */}
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              setIsWishlisted(!isWishlisted);
-            }}
-            className="absolute top-3 right-3 p-2 bg-background/80 backdrop-blur hover:bg-background rounded-lg transition-colors"
+            onClick={e => { e.preventDefault(); setIsWishlisted(!isWishlisted); }}
+            className="absolute bottom-2 right-2 p-1.5 bg-white/90 hover:bg-white rounded-full shadow transition-colors opacity-0 group-hover:opacity-100"
           >
             <Heart
-              className={`w-5 h-5 transition-colors ${
-                isWishlisted ? 'fill-destructive text-destructive' : 'text-foreground'
-              }`}
+              className={`w-4 h-4 ${isWishlisted ? 'fill-[#cc0c39] text-[#cc0c39]' : 'text-[#565959]'}`}
             />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 sm:p-3 lg:p-4 flex flex-col">
-          {/* Category Badge */}
-          <div className="inline-flex w-fit">
-            <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full mb-2 capitalize">
-              {product.category}
-            </span>
-          </div>
-
-          {/* Product Name */}
-          <h3 className="font-semibold text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+        <div className="flex-1 p-3 flex flex-col">
+          {/* Name */}
+          <h3 className="text-sm text-[#0f1111] line-clamp-2 mb-1 leading-snug group-hover:text-[#c45500] transition-colors">
             {product.name}
           </h3>
 
-          {/* Rating */}
-          <div className="flex items-center gap-1 mb-3">
+          {/* Rating row */}
+          <div className="flex items-center gap-1 mb-2">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-3.5 h-3.5 ${
+                  className={`w-3 h-3 ${
                     i < Math.floor(product.rating)
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-muted-foreground'
+                      ? 'fill-[#FF9900] text-[#FF9900]'
+                      : i < product.rating
+                      ? 'fill-[#FF9900]/50 text-[#FF9900]'
+                      : 'text-[#ddd] fill-[#ddd]'
                   }`}
                 />
               ))}
             </div>
-            <span className="text-xs text-muted-foreground">
-              ({product.reviews})
+            <span className="text-xs text-[#0066c0] hover:text-[#c45500]">
+              {product.reviews.toLocaleString()}
             </span>
           </div>
 
-          {/* Description - Hidden on mobile */}
-          <p className="text-sm text-muted-foreground mb-3 line-clamp-2 hidden sm:block">
-            {product.description}
-          </p>
-
-          {/* Price and Button */}
-          <div className="mt-auto space-y-3">
-            <p className="text-2xl font-bold text-foreground">
-              ${product.price.toLocaleString()}
-            </p>
-
-            <Button
-              onClick={handleAddToCart}
-              disabled={!product.inStock || isAdded}
-              className="w-full"
-              size="sm"
-              variant={isAdded ? 'default' : 'default'}
-            >
-              {isAdded ? (
-                'Added to Cart ✓'
-              ) : (
-                <>
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Add to Cart
-                </>
+          {/* Price block */}
+          <div className="mt-auto space-y-0.5">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-lg font-semibold text-[#cc0c39]">
+                ${product.price.toLocaleString()}
+              </span>
+              {product.originalPrice && (
+                <span className="text-xs text-[#565959] line-through">
+                  ${product.originalPrice.toLocaleString()}
+                </span>
               )}
-            </Button>
+            </div>
+            {product.inStock && (
+              <p className="text-xs text-[#007600]">FREE delivery available</p>
+            )}
           </div>
+
+          {/* Add to Cart */}
+          <button
+            onClick={handleAddToCart}
+            disabled={!product.inStock || isAdded}
+            className={`mt-3 w-full flex items-center justify-center gap-1.5 text-xs font-semibold py-1.5 rounded border transition-colors ${
+              isAdded
+                ? 'bg-[#e6f0e6] border-[#007600] text-[#007600]'
+                : product.inStock
+                ? 'bg-[#FFD814] hover:bg-[#F7CA00] border-[#FCD200] text-[#0f1111]'
+                : 'bg-[#f7f7f7] border-[#ddd] text-[#aaa] cursor-not-allowed'
+            }`}
+          >
+            {isAdded ? (
+              '✓ Added'
+            ) : (
+              <>
+                <ShoppingCart className="w-3.5 h-3.5" />
+                Add to Cart
+              </>
+            )}
+          </button>
         </div>
       </div>
     </Link>

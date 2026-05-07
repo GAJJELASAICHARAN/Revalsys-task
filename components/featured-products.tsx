@@ -7,32 +7,19 @@ export default function FeaturedProducts() {
   const featured = getFeaturedProducts();
 
   return (
-    <section className="py-16 sm:py-24 px-4">
+    <section className="py-8 px-4 border-b border-[#e7e7e7]">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between mb-12">
-          <div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-              Featured Products
-            </h2>
-            <p className="text-muted-foreground">
-              Handpicked selection of our most popular items
-            </p>
-          </div>
-          <Link href="/products" className="hidden sm:inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all">
-            View All <ArrowRight className="w-4 h-4" />
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-xl font-bold text-[#0f1111]">Featured Products</h2>
+          <Link href="/products" className="text-sm text-[#0066c0] hover:text-[#c45500] hover:underline flex items-center gap-1">
+            See all <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {featured.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
-        </div>
-
-        <div className="mt-8 sm:hidden">
-          <Link href="/products" className="inline-flex w-full items-center justify-center gap-2 text-primary font-medium">
-            View All Products <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
       </div>
     </section>

@@ -1,140 +1,99 @@
 import Link from 'next/link';
-import { Package, Smartphone, Zap, Heart } from 'lucide-react';
+import BackToTop from '@/components/back-to-top';
+
+const columns = [
+  {
+    heading: 'Get to Know Us',
+    links: [
+      { label: 'About TechHub', href: '/about' },
+      { label: 'Careers', href: '#' },
+      { label: 'Press Releases', href: '#' },
+      { label: 'TechHub Science', href: '#' },
+    ],
+  },
+  {
+    heading: 'Make Money with Us',
+    links: [
+      { label: 'Sell on TechHub', href: '#' },
+      { label: 'Sell Under Private Brands', href: '#' },
+      { label: 'Become an Affiliate', href: '#' },
+      { label: 'Advertise Your Products', href: '#' },
+    ],
+  },
+  {
+    heading: 'TechHub Payment',
+    links: [
+      { label: 'TechHub Business Card', href: '#' },
+      { label: 'Shop with Points', href: '#' },
+      { label: 'Reload Your Balance', href: '#' },
+      { label: 'Currency Converter', href: '#' },
+    ],
+  },
+  {
+    heading: 'Let Us Help You',
+    links: [
+      { label: 'Your Account', href: '#' },
+      { label: 'Your Orders', href: '#' },
+      { label: 'Shipping Rates & Policies', href: '#' },
+      { label: 'Returns & Replacements', href: '#' },
+      { label: 'Contact Us', href: '/contact' },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-card/50">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Brand */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
-                <span className="text-lg font-bold text-primary-foreground">T</span>
-              </div>
-              <span className="font-bold text-lg">TechHub</span>
+    <footer>
+      {/* Back to top */}
+      <BackToTop />
+
+      {/* Main footer */}
+      <div className="bg-[#232F3E] py-10 px-4">
+        <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+          {columns.map(col => (
+            <div key={col.heading}>
+              <h3 className="text-white font-bold text-sm mb-4">{col.heading}</h3>
+              <ul className="space-y-2">
+                {col.links.map(link => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-[#ddd] text-sm hover:text-white transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Your trusted destination for premium electronics with AI-powered shopping intelligence.
-            </p>
-          </div>
-
-          {/* Products */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <Package className="w-4 h-4" />
-              Products
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/products?category=laptops" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Laptops
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=smartphones" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Smartphones
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=tablets" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Tablets
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=accessories" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Accessories
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?category=wearables" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Wearables
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Company</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/deals" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Deals
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Press
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Support
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Shipping Info
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Returns
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                  FAQ
-                </Link>
-              </li>
-            </ul>
-          </div>
+          ))}
         </div>
+      </div>
 
-        {/* Divider */}
-        <div className="border-t border-border py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-muted-foreground">
-            <div>
-              <p>&copy; 2024 TechHub. All rights reserved.</p>
-            </div>
-            <div className="flex items-center justify-start sm:justify-end gap-4">
-              <Link href="#" className="hover:text-foreground transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="#" className="hover:text-foreground transition-colors">
-                Terms of Service
-              </Link>
-            </div>
-          </div>
-        </div>
+      {/* Divider line */}
+      <div className="bg-[#37475A] h-px" />
 
-        {/* Tagline */}
-        <div className="text-center pt-4 text-xs text-muted-foreground flex items-center justify-center gap-1">
-          <span>Made with</span>
-          <Heart className="w-3 h-3 fill-destructive text-destructive" />
-          <span>by TechHub</span>
+      {/* Logo strip */}
+      <div className="bg-[#131921] py-5 flex justify-center">
+        <Link href="/" className="flex items-center gap-1">
+          <span className="text-white font-bold text-2xl">Tech</span>
+          <span className="text-[#FF9900] font-bold text-2xl">Hub</span>
+        </Link>
+      </div>
+
+      {/* Bottom links */}
+      <div className="bg-[#131921] pb-8 px-4">
+        <div className="container mx-auto flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-[#ddd]">
+          <Link href="#" className="hover:text-white hover:underline">Conditions of Use</Link>
+          <Link href="#" className="hover:text-white hover:underline">Privacy Notice</Link>
+          <Link href="#" className="hover:text-white hover:underline">Your Ads Privacy Choices</Link>
+          <Link href="#" className="hover:text-white hover:underline">Consumer Health Data</Link>
+          <Link href="#" className="hover:text-white hover:underline">Cookie Notice</Link>
+          <Link href="#" className="hover:text-white hover:underline">Interest-Based Ads</Link>
         </div>
+        <p className="text-center text-xs text-[#767676] mt-3">
+          © 1996–2025, TechHub, Inc. or its affiliates
+        </p>
       </div>
     </footer>
   );
