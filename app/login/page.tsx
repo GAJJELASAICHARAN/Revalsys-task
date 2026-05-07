@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Zap } from 'lucide-react';
 import { useConvexAuth } from 'convex/react';
+import { toast } from '@/hooks/use-toast';
 
 function LoginForm() {
   const { login, loginAsGuest } = useAuth();
@@ -31,7 +32,21 @@ function LoginForm() {
     setIsLoading(true);
     const result = await login(email, password);
     setIsLoading(false);
-    if (!result.success) setError(result.error || 'Login failed');
+    if (!result.success) {
+      const message = result.error || 'Login failed';
+      setError(message);
+      toast({
+        variant: 'destructive',
+        title: 'Sign in failed',
+        description: message,
+      });
+      return;
+    }
+    toast({
+      variant: 'success',
+      title: 'Signed in successfully',
+      description: 'Welcome back!',
+    });
   };
 
   const handleGuest = () => {

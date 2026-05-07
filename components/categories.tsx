@@ -1,12 +1,18 @@
 import Link from 'next/link';
 import { Laptop, Smartphone, Tablet, Package, Watch } from 'lucide-react';
+import { products, type Product } from '@/lib/products';
 
-const categories = [
-  { name: 'Laptops', slug: 'laptops', icon: Laptop, count: 3, emoji: '💻' },
-  { name: 'Smartphones', slug: 'smartphones', icon: Smartphone, count: 3, emoji: '📱' },
-  { name: 'Tablets', slug: 'tablets', icon: Tablet, count: 2, emoji: '📲' },
-  { name: 'Accessories', slug: 'accessories', icon: Package, count: 2, emoji: '🎧' },
-  { name: 'Wearables', slug: 'wearables', icon: Watch, count: 2, emoji: '⌚' },
+const categories: Array<{
+  name: string;
+  slug: Product['category'];
+  icon: typeof Laptop;
+  emoji: string;
+}> = [
+  { name: 'Laptops', slug: 'laptops', icon: Laptop, emoji: '💻' },
+  { name: 'Smartphones', slug: 'smartphones', icon: Smartphone, emoji: '📱' },
+  { name: 'Tablets', slug: 'tablets', icon: Tablet, emoji: '📲' },
+  { name: 'Accessories', slug: 'accessories', icon: Package, emoji: '🎧' },
+  { name: 'Wearables', slug: 'wearables', icon: Watch, emoji: '⌚' },
 ];
 
 export default function Categories() {
@@ -15,7 +21,9 @@ export default function Categories() {
       <div className="container mx-auto">
         <h2 className="text-xl font-bold text-[#0f1111] mb-5">Shop by Category</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {categories.map(category => (
+          {categories.map(category => {
+            const count = products.filter(p => p.category === category.slug).length;
+            return (
             <Link
               key={category.slug}
               href={`/products?category=${category.slug}`}
@@ -25,9 +33,9 @@ export default function Categories() {
               <h3 className="font-semibold text-sm text-[#0f1111] group-hover:text-[#c45500] transition-colors">
                 {category.name}
               </h3>
-              <p className="text-xs text-[#565959] mt-0.5">{category.count} products</p>
+              <p className="text-xs text-[#565959] mt-0.5">{count} products</p>
             </Link>
-          ))}
+          )})}
         </div>
       </div>
     </section>

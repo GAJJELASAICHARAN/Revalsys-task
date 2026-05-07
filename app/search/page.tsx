@@ -5,16 +5,57 @@ import Footer from '@/components/footer';
 import ProductCard from '@/components/product-card';
 import { intelligentSearch, getFilterSuggestions } from '@/lib/ai-utils';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ArrowRight, Search } from 'lucide-react';
 import Link from 'next/link';
+
+type GeminiSearchResponse = {
+  expandedQuery: string;
+  keywords: string[];
+  detectedCategory?: 'laptops' | 'smartphones' | 'tablets' | 'accessories' | 'wearables';
+};
 
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
 
-  const results = useMemo(() => intelligentSearch(query), [query]);
+  const [effectiveQuery, setEffectiveQuery] = useState(query);
+  const [aiCategory, setAiCategory] = useState<GeminiSearchResponse['detectedCategory']>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      const raw = query.trim();
+      if (!raw) {
+        setEffectiveQuery(query);
+        setAiCategory(undefined);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/gemini/search?q=${encodeURIComponent(raw)}`, { cache: 'no-store' });
+        const json = (await res.json()) as GeminiSearchResponse;
+        if (cancelled) return;
+        setEffectiveQuery((json?.expandedQuery ?? raw).trim() || raw);
+        setAiCategory(json?.detectedCategory);
+      } catch {
+        if (cancelled) return;
+        setEffectiveQuery(raw);
+        setAiCategory(undefined);
+      }
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [query]);
+
+  const results = useMemo(() => {
+    const base = intelligentSearch(effectiveQuery);
+    return aiCategory ? base.filter(p => p.category === aiCategory) : base;
+  }, [effectiveQuery, aiCategory]);
   const suggestions = useMemo(() => getFilterSuggestions(query), [query]);
 
   if (!query) {

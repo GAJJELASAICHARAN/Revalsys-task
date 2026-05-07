@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { products, type Product } from '@/lib/products';
 
 const banners = [
   {
@@ -21,10 +22,26 @@ const banners = [
   },
 ];
 
+function formatINR(amount: number): string {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+function getFromPrice(category: Product['category']): string {
+  const min = products
+    .filter(p => p.category === category)
+    .reduce<number | undefined>((acc, p) => (acc === undefined ? p.price : Math.min(acc, p.price)), undefined);
+
+  return typeof min === 'number' ? `From ${formatINR(min)}` : 'Browse';
+}
+
 const promoCards = [
-  { title: 'Laptops', sub: 'From ₹95,900', href: '/products?category=laptops', emoji: '💻' },
-  { title: 'Smartphones', sub: 'From ₹34,300', href: '/products?category=smartphones', emoji: '📱' },
-  { title: 'Wearables', sub: 'From ₹15,900', href: '/products?category=wearables', emoji: '⌚' },
+  { title: 'Laptops', sub: getFromPrice('laptops'), href: '/products?category=laptops', emoji: '💻' },
+  { title: 'Smartphones', sub: getFromPrice('smartphones'), href: '/products?category=smartphones', emoji: '📱' },
+  { title: 'Wearables', sub: getFromPrice('wearables'), href: '/products?category=wearables', emoji: '⌚' },
   { title: "Today's Deals", sub: 'Save up to 40%', href: '/deals', emoji: '🏷️' },
 ];
 

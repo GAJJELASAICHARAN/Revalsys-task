@@ -5,6 +5,7 @@ import { ConvexAuthNextjsServerProvider } from '@convex-dev/auth/nextjs/server'
 import { ConvexClientProvider } from '@/components/convex-client-provider'
 import { AuthProvider } from '@/lib/auth-context'
 import { CartProvider } from '@/lib/cart-context'
+import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -46,6 +47,7 @@ export default function RootLayout({
               </CartProvider>
             </AuthProvider>
           </ConvexClientProvider>
+          <Toaster />
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </body>
       </html>

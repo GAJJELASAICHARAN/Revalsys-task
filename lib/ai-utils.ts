@@ -43,12 +43,37 @@ export function getAIRecommendations(
     .map(r => r.product);
 }
 
+function expandSearchTerms(query: string): { normalizedQuery: string; terms: string[] } {
+  const normalizedQuery = query.toLowerCase().trim();
+  const rawTerms = normalizedQuery.split(/\s+/).filter(Boolean);
+
+  const synonyms: Record<string, string[]> = {
+    mobiles: ['mobile', 'phone', 'smartphone'],
+    mobile: ['phone', 'smartphone'],
+    cellphone: ['phone', 'smartphone', 'mobile'],
+    cellphones: ['phone', 'smartphone', 'mobile'],
+    phone: ['smartphone', 'mobile'],
+    phones: ['phone', 'smartphone', 'mobile'],
+    smartphone: ['phone', 'mobile'],
+    smartphones: ['smartphone', 'phone', 'mobile'],
+  };
+
+  const terms = new Set<string>();
+  for (const t of rawTerms) {
+    terms.add(t);
+    // Light singularization for simple plurals (mobiles -> mobile, phones -> phone)
+    if (t.length > 3 && t.endsWith('s')) terms.add(t.slice(0, -1));
+    for (const syn of synonyms[t] ?? []) terms.add(syn);
+  }
+
+  return { normalizedQuery, terms: [...terms] };
+}
+
 // Natural language product search with scoring
 export function intelligentSearch(query: string): Product[] {
   if (!query.trim()) return [];
 
-  const lowercaseQuery = query.toLowerCase();
-  const queryWords = lowercaseQuery.split(/\s+/);
+  const { normalizedQuery, terms: queryWords } = expandSearchTerms(query);
 
   const results: { product: Product; score: number }[] = [];
 
@@ -57,12 +82,12 @@ export function intelligentSearch(query: string): Product[] {
     const productText = `${product.name} ${product.description} ${product.category}`.toLowerCase();
 
     // Exact name match - highest priority
-    if (product.name.toLowerCase() === lowercaseQuery) {
+    if (product.name.toLowerCase() === normalizedQuery) {
       score += 100;
     }
 
     // Name contains query
-    if (product.name.toLowerCase().includes(lowercaseQuery)) {
+    if (product.name.toLowerCase().includes(normalizedQuery)) {
       score += 50;
     }
 
@@ -76,13 +101,13 @@ export function intelligentSearch(query: string): Product[] {
 
     // Specs matching
     Object.values(product.specs).forEach(spec => {
-      if (spec.toLowerCase().includes(lowercaseQuery)) score += 20;
+      if (spec.toLowerCase().includes(normalizedQuery)) score += 20;
     });
 
-    // In stock bonus
-    if (product.inStock) score += 3;
-
+    // Only apply non-relevance bonuses after we have a real match.
     if (score > 0) {
+      // In stock bonus
+      if (product.inStock) score += 3;
       results.push({ product, score });
     }
   });

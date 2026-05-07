@@ -8,6 +8,7 @@ import { useConvexAuth } from 'convex/react';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 function RegisterForm() {
   const { signIn } = useAuthActions();
@@ -42,9 +43,20 @@ function RegisterForm() {
     setIsLoading(true);
     try {
       await signIn('password', { email, password, name, flow: 'signUp' });
+      toast({
+        variant: 'success',
+        title: 'Signed up successfully',
+        description: 'Your account has been created.',
+      });
     } catch (err: any) {
       const msg: string = err?.message ?? 'Registration failed';
-      setError(msg.includes('already') ? 'An account with this email already exists' : msg);
+      const message = msg.includes('already') ? 'An account with this email already exists' : msg;
+      setError(message);
+      toast({
+        variant: 'destructive',
+        title: 'Sign up failed',
+        description: message,
+      });
     } finally {
       setIsLoading(false);
     }

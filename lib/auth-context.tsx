@@ -65,8 +65,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: true };
     } catch (err: any) {
       const msg: string = err?.message ?? 'Invalid email or password';
-      // Surface a clean message for wrong credentials
-      if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('not found')) {
+      const lower = msg.toLowerCase();
+      // Surface clean messages for common auth failures
+      if (
+        lower.includes('not found') ||
+        lower.includes('no account') ||
+        lower.includes('does not exist') ||
+        lower.includes('user not found')
+      ) {
+        return { success: false, error: 'User is not registered' };
+      }
+      if (lower.includes('invalid') || lower.includes('wrong password')) {
         return { success: false, error: 'Invalid email or password' };
       }
       return { success: false, error: msg };
