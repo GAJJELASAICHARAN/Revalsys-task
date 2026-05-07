@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/lib/cart-context';
 import { useAuth } from '@/lib/auth-context';
 import { useConvexAuth, useQuery } from 'convex/react';
@@ -29,13 +29,23 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Keep the header search box in sync with /search?q=...
+  useEffect(() => {
+    if (pathname === '/search') {
+      setSearchQuery(searchParams.get('q') ?? '');
+      return;
+    }
+    setSearchQuery('');
+  }, [pathname, searchParams]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
     }
   };
 
