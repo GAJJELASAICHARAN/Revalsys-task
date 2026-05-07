@@ -149,7 +149,10 @@ export default function Header() {
             </div>
 
             {/* Returns & Orders */}
-            <Link href={isAuthenticated ? '/account' : '/login'} className="hidden md:flex flex-col items-start border border-transparent hover:border-white rounded px-2 py-1 transition-colors flex-shrink-0">
+            <Link
+              href={isAuthenticated ? '/account/orders?view=returned' : '/login'}
+              className="hidden md:flex flex-col items-start border border-transparent hover:border-white rounded px-2 py-1 transition-colors flex-shrink-0"
+            >
               <span className="text-[#ccc] text-[10px] leading-none">Returns</span>
               <span className="text-white text-xs font-bold">& Orders</span>
             </Link>

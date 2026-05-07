@@ -5,7 +5,7 @@ import Footer from '@/components/footer';
 import { useAuth } from '@/lib/auth-context';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,8 +23,10 @@ const STATUS_COLORS: Record<string, string> = {
 export default function OrdersPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [view, setView] = useState<'all' | 'returned'>('all');
+  const initialView = searchParams.get('view') === 'returned' ? 'returned' : 'all';
+  const [view, setView] = useState<'all' | 'returned'>(initialView);
   const allOrders = useQuery(api.orders.getUserOrders);
   const returnedOrders = useQuery(api.orders.getUserReturnedOrders);
   const returnOrder = useMutation(api.orders.returnOrder);
@@ -78,11 +80,11 @@ export default function OrdersPage() {
             <div className="bg-white border border-[#ddd] rounded p-8 text-center">
               <ShoppingBag className="w-12 h-12 text-[#aaa] mx-auto mb-3" />
               <p className="font-semibold text-[#0f1111] mb-1">
-                {view === 'returned' ? 'No returned orders' : 'No orders yet'}
+                {view === 'returned' ? 'No products returned' : 'No orders yet'}
               </p>
               <p className="text-sm text-[#565959] mb-4">
                 {view === 'returned'
-                  ? 'Returned orders will appear here.'
+                  ? 'Returned products will appear here.'
                   : 'When you place an order, it will appear here.'}
               </p>
               {view === 'returned' ? (
