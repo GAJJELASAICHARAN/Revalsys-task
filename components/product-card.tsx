@@ -107,7 +107,8 @@ export default function ProductCard({ product, removeFromWishlistOnAdd = false }
           {/* Wishlist */}
           <button
             onClick={handleWishlist}
-            className="absolute bottom-2 right-2 p-1.5 bg-white/90 hover:bg-white rounded-full shadow transition-colors opacity-0 group-hover:opacity-100"
+            aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+            className="absolute bottom-2 right-2 p-1.5 bg-white/90 hover:bg-white rounded-full shadow transition-colors"
           >
             <Heart
               className={`w-4 h-4 ${wishlisted ? 'fill-[#cc0c39] text-[#cc0c39]' : 'text-[#565959]'}`}
