@@ -4,8 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/products';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
-import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
+import { useConvexAuth, useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { useState } from 'react';
 
 interface ProductCardProps {
   product: Product;
@@ -18,14 +20,32 @@ const badgeColors: Record<string, string> = {
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const { addItem } = useCart();
   const [isAdded, setIsAdded] = useState(false);
+  const [localWish, setLocalWish] = useState(false); // guest fallback
+
+  const { isAuthenticated } = useConvexAuth();
+  const isWishlisted = useQuery(
+    api.wishlist.isWishlisted,
+    isAuthenticated ? { productId: product.id } : 'skip'
+  );
+  const toggleWishlist = useMutation(api.wishlist.toggle);
+
+  const wishlisted = isAuthenticated ? !!isWishlisted : localWish;
+
+  const handleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      await toggleWishlist({ productId: product.id });
+    } else {
+      setLocalWish(w => !w);
+    }
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addItem({
-      id: product.id,
+      productId: product.id,
       name: product.name,
       price: product.price,
       quantity: 1,
@@ -35,10 +55,9 @@ export default function ProductCard({ product }: ProductCardProps) {
     setTimeout(() => setIsAdded(false), 2000);
   };
 
-  const discount =
-    product.originalPrice
-      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-      : null;
+  const discount = product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : null;
 
   return (
     <Link href={`/products/${product.id}`}>
@@ -66,7 +85,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           )}
 
-          {/* Discount % */}
+          {/* Discount */}
           {discount && (
             <span className="absolute top-2 right-2 text-[10px] font-bold bg-[#cc0c39] text-white px-1.5 py-0.5 rounded">
               -{discount}%
@@ -75,23 +94,22 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Wishlist */}
           <button
-            onClick={e => { e.preventDefault(); setIsWishlisted(!isWishlisted); }}
+            onClick={handleWishlist}
             className="absolute bottom-2 right-2 p-1.5 bg-white/90 hover:bg-white rounded-full shadow transition-colors opacity-0 group-hover:opacity-100"
           >
             <Heart
-              className={`w-4 h-4 ${isWishlisted ? 'fill-[#cc0c39] text-[#cc0c39]' : 'text-[#565959]'}`}
+              className={`w-4 h-4 ${wishlisted ? 'fill-[#cc0c39] text-[#cc0c39]' : 'text-[#565959]'}`}
             />
           </button>
         </div>
 
         {/* Content */}
         <div className="flex-1 p-3 flex flex-col">
-          {/* Name */}
           <h3 className="text-sm text-[#0f1111] line-clamp-2 mb-1 leading-snug group-hover:text-[#c45500] transition-colors">
             {product.name}
           </h3>
 
-          {/* Rating row */}
+          {/* Rating */}
           <div className="flex items-center gap-1 mb-2">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
@@ -100,19 +118,15 @@ export default function ProductCard({ product }: ProductCardProps) {
                   className={`w-3 h-3 ${
                     i < Math.floor(product.rating)
                       ? 'fill-[#FF9900] text-[#FF9900]'
-                      : i < product.rating
-                      ? 'fill-[#FF9900]/50 text-[#FF9900]'
-                      : 'text-[#ddd] fill-[#ddd]'
+                      : 'fill-[#ddd] text-[#ddd]'
                   }`}
                 />
               ))}
             </div>
-            <span className="text-xs text-[#0066c0] hover:text-[#c45500]">
-              {product.reviews.toLocaleString()}
-            </span>
+            <span className="text-xs text-[#0066c0]">{product.reviews.toLocaleString()}</span>
           </div>
 
-          {/* Price block */}
+          {/* Price */}
           <div className="mt-auto space-y-0.5">
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-lg font-semibold text-[#cc0c39]">
@@ -141,14 +155,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 : 'bg-[#f7f7f7] border-[#ddd] text-[#aaa] cursor-not-allowed'
             }`}
           >
-            {isAdded ? (
-              '✓ Added'
-            ) : (
-              <>
-                <ShoppingCart className="w-3.5 h-3.5" />
-                Add to Cart
-              </>
-            )}
+            {isAdded ? '✓ Added' : <><ShoppingCart className="w-3.5 h-3.5" />Add to Cart</>}
           </button>
         </div>
       </div>

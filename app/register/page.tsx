@@ -1,22 +1,25 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth-context';
-import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Zap } from 'lucide-react';
+import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Eye, EyeOff } from 'lucide-react';
 
-function LoginForm() {
-  const { login, loginAsGuest } = useAuth();
+function RegisterForm() {
+  const { signIn } = useAuthActions();
   const { isAuthenticated } = useConvexAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,54 +28,73 @@ function LoginForm() {
     if (isAuthenticated) router.replace(redirect);
   }, [isAuthenticated, router, redirect]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    if (password !== confirm) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     setIsLoading(true);
-    const result = await login(email, password);
-    setIsLoading(false);
-    if (!result.success) setError(result.error || 'Login failed');
+    try {
+      await signIn('password', { email, password, name, flow: 'signUp' });
+    } catch (err: any) {
+      const msg: string = err?.message ?? 'Registration failed';
+      setError(msg.includes('already') ? 'An account with this email already exists' : msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGuest = () => {
-    loginAsGuest();
-    router.push(redirect);
-  };
+  const inputCls =
+    'w-full px-3 py-2 border border-[#a6a6a6] rounded-sm text-sm focus:outline-none focus:border-[#e77600] focus:ring-2 focus:ring-[#e77600]/30';
 
   return (
     <div className="w-full max-w-sm">
       <div className="bg-white border border-[#ddd] rounded-lg p-8 shadow-sm">
-        <h1 className="text-[28px] font-normal text-[#0f1111] mb-6">Sign in</h1>
+        <h1 className="text-[28px] font-normal text-[#0f1111] mb-6">Create account</h1>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-bold text-[#0f1111] mb-1">
-              Email address
-            </label>
+            <label className="block text-sm font-bold text-[#0f1111] mb-1">Your name</label>
             <input
-              id="email"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+              placeholder="First and last name"
+              autoComplete="name"
+              className={inputCls}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-[#0f1111] mb-1">Email address</label>
+            <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full px-3 py-2 border border-[#a6a6a6] rounded-sm text-sm focus:outline-none focus:border-[#e77600] focus:ring-2 focus:ring-[#e77600]/30"
+              className={inputCls}
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-bold text-[#0f1111] mb-1">
-              Password
-            </label>
+            <label className="block text-sm font-bold text-[#0f1111] mb-1">Password</label>
             <div className="relative">
               <input
-                id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                autoComplete="current-password"
-                className="w-full px-3 py-2 pr-10 border border-[#a6a6a6] rounded-sm text-sm focus:outline-none focus:border-[#e77600] focus:ring-2 focus:ring-[#e77600]/30"
+                autoComplete="new-password"
+                placeholder="At least 6 characters"
+                className={`${inputCls} pr-10`}
               />
               <button
                 type="button"
@@ -82,6 +104,21 @@ function LoginForm() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            <p className="text-xs text-[#565959] mt-1">Passwords must be at least 6 characters.</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-[#0f1111] mb-1">
+              Re-enter password
+            </label>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+              required
+              autoComplete="new-password"
+              className={inputCls}
+            />
           </div>
 
           {error && (
@@ -95,56 +132,29 @@ function LoginForm() {
             disabled={isLoading}
             className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] font-semibold border border-[#FCD200] rounded-sm h-9 text-sm"
           >
-            {isLoading ? 'Signing in…' : 'Sign in'}
+            {isLoading ? 'Creating account…' : 'Create your TechHub account'}
           </Button>
         </form>
 
         <p className="text-xs text-[#565959] mt-4">
-          By signing in you agree to TechHub&apos;s{' '}
+          By creating an account you agree to TechHub&apos;s{' '}
           <span className="text-[#0066c0] cursor-pointer hover:underline">Conditions of Use</span>{' '}
           and{' '}
           <span className="text-[#0066c0] cursor-pointer hover:underline">Privacy Notice</span>.
         </p>
 
-        {/* OR divider */}
-        <div className="relative my-5">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#e7e7e7]" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-white px-3 text-xs text-[#767676]">or</span>
-          </div>
-        </div>
-
-        <button
-          onClick={handleGuest}
-          className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-[#d5d9d9] rounded-sm text-sm text-[#0f1111] bg-[#f0f2f2] hover:bg-[#e7e9ec] transition-colors"
-        >
-          <Zap className="w-4 h-4 text-[#FF9900]" />
-          Continue as Guest
-        </button>
-      </div>
-
-      {/* New customer */}
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-[#ddd]" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-[#f3f3f3] px-3 text-xs text-[#767676]">New to TechHub?</span>
+        <div className="border-t border-[#e7e7e7] mt-5 pt-4 text-sm text-[#565959]">
+          Already have an account?{' '}
+          <Link href="/login" className="text-[#0066c0] hover:text-[#c45500] hover:underline">
+            Sign in
+          </Link>
         </div>
       </div>
-
-      <Link href={`/register${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}>
-        <button className="w-full py-2 px-4 border border-[#d5d9d9] rounded-sm text-sm text-[#0f1111] bg-[#f0f2f2] hover:bg-[#e7e9ec] transition-colors">
-          Create your TechHub account
-        </button>
-      </Link>
     </div>
   );
 }
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-[#f3f3f3] flex flex-col">
       <header className="bg-[#131921] py-3 px-4 flex justify-center">
@@ -155,8 +165,8 @@ export default function LoginPage() {
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <Suspense fallback={<div className="w-full max-w-sm h-72 bg-white rounded-lg animate-pulse" />}>
-          <LoginForm />
+        <Suspense fallback={<div className="w-full max-w-sm h-80 bg-white rounded-lg animate-pulse" />}>
+          <RegisterForm />
         </Suspense>
       </main>
 

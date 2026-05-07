@@ -7,6 +7,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
+import { useConvexAuth, useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 import ProductRecommendations from '@/components/product-recommendations';
 
 const badgeColors: Record<string, string> = {
@@ -18,11 +20,28 @@ const badgeColors: Record<string, string> = {
 export default function ProductDetailClient({ product }: { product: Product }) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [localWish, setLocalWish] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
+  const { isAuthenticated } = useConvexAuth();
+  const isWishlistedConvex = useQuery(
+    api.wishlist.isWishlisted,
+    isAuthenticated ? { productId: product.id } : 'skip'
+  );
+  const toggleWishlist = useMutation(api.wishlist.toggle);
+
+  const isWishlisted = isAuthenticated ? !!isWishlistedConvex : localWish;
+
+  const handleWishlist = async () => {
+    if (isAuthenticated) {
+      await toggleWishlist({ productId: product.id });
+    } else {
+      setLocalWish(w => !w);
+    }
+  };
+
   const handleAddToCart = () => {
-    addItem({ id: product.id, name: product.name, price: product.price, quantity, image: product.image });
+    addItem({ productId: product.id, name: product.name, price: product.price, quantity, image: product.image });
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
   };
@@ -178,7 +197,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 >
                   Buy Now
                 </Button>
-                <Button variant="outline" size="lg" onClick={() => setIsWishlisted(!isWishlisted)} className="px-4 border-[#ddd]">
+                <Button variant="outline" size="lg" onClick={handleWishlist} className="px-4 border-[#ddd]">
                   <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-[#cc0c39] text-[#cc0c39]' : 'text-[#565959]'}`} />
                 </Button>
               </div>

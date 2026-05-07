@@ -1,6 +1,5 @@
 'use client';
 
-import type { Metadata } from 'next';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useCart } from '@/lib/cart-context';
@@ -135,9 +134,11 @@ function CartContent() {
               <p className="text-xs text-[#565959] mb-4">
                 Estimated tax: ${(totalPrice * 0.08).toLocaleString('en-US', { maximumFractionDigits: 2 })}
               </p>
-              <Button className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] font-semibold border border-[#FCD200] rounded-sm">
-                Proceed to checkout
-              </Button>
+              <Link href="/checkout" className="block">
+                <Button className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] font-semibold border border-[#FCD200] rounded-sm">
+                  Proceed to checkout
+                </Button>
+              </Link>
             </div>
 
             {/* Trust badges */}
