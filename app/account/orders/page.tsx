@@ -3,10 +3,10 @@
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useAuth } from '@/lib/auth-context';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingBag } from 'lucide-react';
@@ -16,6 +16,7 @@ const STATUS_COLORS: Record<string, string> = {
   processing: 'bg-blue-100 text-blue-800',
   shipped: 'bg-purple-100 text-purple-800',
   delivered: 'bg-green-100 text-green-800',
+  returned: 'bg-gray-200 text-gray-800',
   cancelled: 'bg-red-100 text-red-800',
 };
 
@@ -23,7 +24,15 @@ export default function OrdersPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
-  const orders = useQuery(api.orders.getUserOrders);
+  const [view, setView] = useState<'all' | 'returned'>('all');
+  const allOrders = useQuery(api.orders.getUserOrders);
+  const returnedOrders = useQuery(api.orders.getUserReturnedOrders);
+  const returnOrder = useMutation(api.orders.returnOrder);
+
+  const orders = useMemo(() => {
+    if (view === 'returned') return returnedOrders;
+    return allOrders;
+  }, [view, allOrders, returnedOrders]);
 
   useEffect(() => {
     if (!isLoading && !user) router.replace('/login?redirect=/account/orders');
@@ -68,16 +77,52 @@ export default function OrdersPage() {
           ) : orders.length === 0 ? (
             <div className="bg-white border border-[#ddd] rounded p-8 text-center">
               <ShoppingBag className="w-12 h-12 text-[#aaa] mx-auto mb-3" />
-              <p className="font-semibold text-[#0f1111] mb-1">No orders yet</p>
-              <p className="text-sm text-[#565959] mb-4">
-                When you place an order, it will appear here.
+              <p className="font-semibold text-[#0f1111] mb-1">
+                {view === 'returned' ? 'No returned orders' : 'No orders yet'}
               </p>
-              <Link href="/products" className="text-sm text-[#0066c0] hover:underline">
-                Start shopping →
-              </Link>
+              <p className="text-sm text-[#565959] mb-4">
+                {view === 'returned'
+                  ? 'Returned orders will appear here.'
+                  : 'When you place an order, it will appear here.'}
+              </p>
+              {view === 'returned' ? (
+                <button
+                  onClick={() => setView('all')}
+                  className="text-sm text-[#0066c0] hover:underline"
+                >
+                  View all orders →
+                </button>
+              ) : (
+                <Link href="/products" className="text-sm text-[#0066c0] hover:underline">
+                  Start shopping →
+                </Link>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setView('all')}
+                  className={`px-3 py-1.5 rounded text-sm border ${
+                    view === 'all'
+                      ? 'bg-[#232f3e] text-white border-[#232f3e]'
+                      : 'bg-white text-[#0f1111] border-[#ddd]'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setView('returned')}
+                  className={`px-3 py-1.5 rounded text-sm border ${
+                    view === 'returned'
+                      ? 'bg-[#232f3e] text-white border-[#232f3e]'
+                      : 'bg-white text-[#0f1111] border-[#ddd]'
+                  }`}
+                >
+                  Returned
+                </button>
+              </div>
+
               {orders.map((order: any) => (
                 <div key={order._id} className="bg-white border border-[#ddd] rounded overflow-hidden">
                   {/* Order header */}
@@ -107,10 +152,38 @@ export default function OrdersPage() {
                           </span>
                         </p>
                       </div>
+                      {order.status === 'returned' && order.returnedAt ? (
+                        <div>
+                          <span className="font-bold uppercase">Returned</span>
+                          <p className="text-[#0f1111] font-medium">
+                            {new Date(order.returnedAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                          </p>
+                        </div>
+                      ) : null}
                     </div>
-                    <p className="text-xs text-[#565959]">
-                      Order # <span className="text-[#0066c0]">{order._id.slice(-8).toUpperCase()}</span>
-                    </p>
+                    <div className="flex items-center gap-3">
+                      {order.status === 'shipped' || order.status === 'delivered' ? (
+                        <button
+                          onClick={async () => {
+                            await returnOrder({ orderId: order._id });
+                            setView('returned');
+                          }}
+                          className="text-xs px-3 py-1.5 rounded bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] border border-[#fcd200]"
+                        >
+                          Return
+                        </button>
+                      ) : null}
+                      <p className="text-xs text-[#565959]">
+                        Order #{" "}
+                        <span className="text-[#0066c0]">
+                          {order._id.slice(-8).toUpperCase()}
+                        </span>
+                      </p>
+                    </div>
                   </div>
 
                   {/* Order items */}

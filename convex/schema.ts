@@ -41,8 +41,11 @@ export default defineSchema({
       v.literal("processing"),
       v.literal("shipped"),
       v.literal("delivered"),
+      v.literal("returned"),
       v.literal("cancelled")
     ),
+    returnedAt: v.optional(v.number()),
+    returnReason: v.optional(v.string()),
     shippingAddress: v.optional(
       v.object({
         name: v.string(),
@@ -53,5 +56,7 @@ export default defineSchema({
         country: v.string(),
       })
     ),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_status", ["userId", "status"]),
 });

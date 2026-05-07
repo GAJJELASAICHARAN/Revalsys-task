@@ -41,7 +41,7 @@ export const placeOrder = mutation({
       subtotal,
       tax,
       total,
-      status: "pending",
+      status: "shipped",
       shippingAddress: args.shippingAddress,
     });
 
@@ -77,5 +77,46 @@ export const getOrder = query({
     const order = await ctx.db.get(args.orderId);
     if (!order || order.userId !== userId) return null;
     return order;
+  },
+});
+
+export const returnOrder = mutation({
+  args: {
+    orderId: v.id("orders"),
+    reason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const order = await ctx.db.get(args.orderId);
+    if (!order || order.userId !== userId) throw new Error("Order not found");
+
+    if (order.status !== "shipped" && order.status !== "delivered") {
+      throw new Error("Only shipped or delivered orders can be returned");
+    }
+
+    await ctx.db.patch(args.orderId, {
+      status: "returned",
+      returnedAt: Date.now(),
+      returnReason: args.reason,
+    });
+
+    return null;
+  },
+});
+
+export const getUserReturnedOrders = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+    return ctx.db
+      .query("orders")
+      .withIndex("by_user_and_status", (q) =>
+        q.eq("userId", userId).eq("status", "returned")
+      )
+      .order("desc")
+      .collect();
   },
 });
