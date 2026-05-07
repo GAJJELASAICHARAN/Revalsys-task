@@ -100,10 +100,13 @@ function LoginForm() {
         </form>
 
         <p className="text-xs text-[#565959] mt-4">
-          By signing in you agree to TechHub&apos;s{' '}
-          <span className="text-[#0066c0] cursor-pointer hover:underline">Conditions of Use</span>{' '}
-          and{' '}
-          <span className="text-[#0066c0] cursor-pointer hover:underline">Privacy Notice</span>.
+          Don&apos;t have an account?{' '}
+          <Link
+            href={`/register${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
+            className="text-[#0066c0] hover:text-[#c45500] hover:underline"
+          >
+            Sign up
+          </Link>
         </p>
 
         {/* OR divider */}
@@ -125,21 +128,6 @@ function LoginForm() {
         </button>
       </div>
 
-      {/* New customer */}
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-[#ddd]" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-[#f3f3f3] px-3 text-xs text-[#767676]">New to TechHub?</span>
-        </div>
-      </div>
-
-      <Link href={`/register${redirect !== '/' ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}>
-        <button className="w-full py-2 px-4 border border-[#d5d9d9] rounded-sm text-sm text-[#0f1111] bg-[#f0f2f2] hover:bg-[#e7e9ec] transition-colors">
-          Create your TechHub account
-        </button>
-      </Link>
     </div>
   );
 }

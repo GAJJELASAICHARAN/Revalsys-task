@@ -132,16 +132,9 @@ function RegisterForm() {
             disabled={isLoading}
             className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] font-semibold border border-[#FCD200] rounded-sm h-9 text-sm"
           >
-            {isLoading ? 'Creating account…' : 'Create your TechHub account'}
+            {isLoading ? 'Signing up…' : 'Sign up'}
           </Button>
         </form>
-
-        <p className="text-xs text-[#565959] mt-4">
-          By creating an account you agree to TechHub&apos;s{' '}
-          <span className="text-[#0066c0] cursor-pointer hover:underline">Conditions of Use</span>{' '}
-          and{' '}
-          <span className="text-[#0066c0] cursor-pointer hover:underline">Privacy Notice</span>.
-        </p>
 
         <div className="border-t border-[#e7e7e7] mt-5 pt-4 text-sm text-[#565959]">
           Already have an account?{' '}
