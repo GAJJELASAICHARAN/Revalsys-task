@@ -25,7 +25,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zip: '',
-    country: 'United States',
+    country: 'Hyderabad',
   });
   const [submitting, setSubmitting] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);

@@ -59,7 +59,7 @@ export default function Header() {
               <span className="text-[#ccc] text-[10px] leading-none">Deliver to</span>
               <div className="flex items-center gap-0.5 mt-0.5">
                 <MapPin className="w-3.5 h-3.5 text-white" />
-                <span className="text-white text-xs font-bold">United States</span>
+                <span className="text-white text-xs font-bold">Hyderabad</span>
               </div>
             </div>
 
