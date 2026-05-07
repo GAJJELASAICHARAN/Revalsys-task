@@ -64,7 +64,7 @@ function CartContent() {
                 </Link>
                 <p className="text-xs text-[#007600] mb-2">In Stock</p>
                 <p className="text-xl font-semibold text-[#0f1111] mb-3">
-                  ${item.price.toLocaleString()}
+                  ₹{item.price.toLocaleString()}
                 </p>
 
                 <div className="flex items-center gap-4 flex-wrap">
@@ -103,7 +103,7 @@ function CartContent() {
               {/* Line total */}
               <div className="hidden sm:block flex-shrink-0 text-right">
                 <p className="font-bold text-[#0f1111]">
-                  ${(item.price * item.quantity).toLocaleString()}
+                  ₹{(item.price * item.quantity).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -113,7 +113,7 @@ function CartContent() {
           <div className="text-right pr-4">
             <span className="text-lg text-[#0f1111]">
               Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items):{' '}
-              <strong>${totalPrice.toLocaleString()}</strong>
+              <strong>₹{totalPrice.toLocaleString()}</strong>
             </span>
           </div>
         </div>
@@ -129,10 +129,10 @@ function CartContent() {
             <div className="border-t border-[#e7e7e7] pt-4">
               <p className="text-lg text-[#0f1111] mb-1">
                 Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items):{' '}
-                <strong>${totalPrice.toLocaleString()}</strong>
+                <strong>₹{totalPrice.toLocaleString()}</strong>
               </p>
               <p className="text-xs text-[#565959] mb-4">
-                Estimated tax: ${(totalPrice * 0.08).toLocaleString('en-US', { maximumFractionDigits: 2 })}
+                Estimated tax: ₹{(totalPrice * 0.08).toLocaleString('en-US', { maximumFractionDigits: 2 })}
               </p>
               <Link href="/checkout" className="block">
                 <Button className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0f1111] font-semibold border border-[#FCD200] rounded-sm">
@@ -149,7 +149,7 @@ function CartContent() {
               </div>
               <div className="flex items-center gap-2">
                 <Truck className="w-3.5 h-3.5 text-[#565959]" />
-                Free shipping on orders over $50
+                Free shipping on orders over ₹4,000
               </div>
               <div className="flex items-center gap-2">
                 <RotateCcw className="w-3.5 h-3.5 text-[#565959]" />

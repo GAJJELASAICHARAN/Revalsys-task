@@ -28,7 +28,7 @@ function SearchContent() {
           </p>
           <div className="space-y-2 text-left bg-white border border-[#ddd] rounded p-4">
             <p className="text-xs font-bold text-[#0f1111] uppercase mb-3">Try searching for:</p>
-            {['Gaming laptop under $2000', 'Best budget smartphone', 'Premium tablet for design'].map(s => (
+            {['Gaming laptop under ₹150,000', 'Best budget smartphone', 'Premium tablet for design'].map(s => (
               <Link
                 key={s}
                 href={`/search?q=${encodeURIComponent(s)}`}
@@ -65,7 +65,7 @@ function SearchContent() {
               <strong>AI detected:</strong>{' '}
               {suggestions.category && <>Category: <em>{suggestions.category}</em></>}
               {suggestions.category && suggestions.priceRange && ' · '}
-              {suggestions.priceRange && <>Budget: ${suggestions.priceRange.min}–${suggestions.priceRange.max}</>}
+              {suggestions.priceRange && <>Budget: ₹{suggestions.priceRange.min}–₹{suggestions.priceRange.max}</>}
             </p>
           </div>
         )}

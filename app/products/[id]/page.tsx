@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: product.name,
-    description: `${product.description}. ${discount ? `Save ${discount}% — now $${product.price.toLocaleString()}.` : `$${product.price.toLocaleString()}.`} Free shipping. 30-day returns. Shop at TechHub.`,
+    description: `${product.description}. ${discount ? `Save ${discount}% — now ₹${product.price.toLocaleString()}.` : `₹${product.price.toLocaleString()}.`} Free shipping. 30-day returns. Shop at TechHub.`,
     openGraph: {
       title: `${product.name} | TechHub`,
       description: product.description,

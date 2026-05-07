@@ -11,10 +11,10 @@ import { Button } from '@/components/ui/button';
 
 const categories = ['laptops', 'smartphones', 'tablets', 'accessories', 'wearables'];
 const priceRanges = [
-  { label: 'Under $500', min: 0, max: 500 },
-  { label: '$500 – $1,000', min: 500, max: 1000 },
-  { label: '$1,000 – $2,000', min: 1000, max: 2000 },
-  { label: 'Over $2,000', min: 2000, max: Infinity },
+  { label: 'Under ₹40,000', min: 0, max: 40000 },
+  { label: '₹40,000 – ₹80,000', min: 40000, max: 80000 },
+  { label: '₹80,000 – ₹1,60,000', min: 80000, max: 160000 },
+  { label: 'Over ₹1,60,000', min: 160000, max: Infinity },
 ];
 
 export default function ProductsPage() {

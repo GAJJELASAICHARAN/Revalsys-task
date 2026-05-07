@@ -22,9 +22,9 @@ const banners = [
 ];
 
 const promoCards = [
-  { title: 'Laptops', sub: 'From $799', href: '/products?category=laptops', emoji: '💻' },
-  { title: 'Smartphones', sub: 'From $429', href: '/products?category=smartphones', emoji: '📱' },
-  { title: 'Wearables', sub: 'From $149', href: '/products?category=wearables', emoji: '⌚' },
+  { title: 'Laptops', sub: 'From ₹95,900', href: '/products?category=laptops', emoji: '💻' },
+  { title: 'Smartphones', sub: 'From ₹34,300', href: '/products?category=smartphones', emoji: '📱' },
+  { title: 'Wearables', sub: 'From ₹15,900', href: '/products?category=wearables', emoji: '⌚' },
   { title: "Today's Deals", sub: 'Save up to 40%', href: '/deals', emoji: '🏷️' },
 ];
 

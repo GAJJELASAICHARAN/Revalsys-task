@@ -179,21 +179,21 @@ export function getFilterSuggestions(query: string): {
 
   // Price range detection
   const pricePatterns = [
-    { regex: /under\s*\$?(\d+)/i, max: 1 },
-    { regex: /under\s*(\d+)/i, max: 1 },
-    { regex: /less\s*than\s*\$?(\d+)/i, max: 1 },
-    { regex: /\$?(\d+)-\$?(\d+)/i, range: 1 },
+    { regex: /under\s*[$₹]?([\d,]+)/i, max: 1 },
+    { regex: /under\s*([\d,]+)/i, max: 1 },
+    { regex: /less\s*than\s*[$₹]?([\d,]+)/i, max: 1 },
+    { regex: /[$₹]?([\d,]+)\s*[-–]\s*[$₹]?([\d,]+)/i, range: 1 },
   ];
 
   for (const pattern of pricePatterns) {
     const match = lowercaseQuery.match(pattern.regex);
     if (match) {
       if ('max' in pattern) {
-        suggestions.priceRange = { min: 0, max: parseInt(match[1]) };
+        suggestions.priceRange = { min: 0, max: parseInt(match[1].replace(/,/g, '')) };
       } else if ('range' in pattern) {
         suggestions.priceRange = {
-          min: parseInt(match[1]),
-          max: parseInt(match[2]),
+          min: parseInt(match[1].replace(/,/g, '')),
+          max: parseInt(match[2].replace(/,/g, '')),
         };
       }
       break;

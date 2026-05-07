@@ -130,11 +130,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="mt-auto space-y-0.5">
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-lg font-semibold text-[#cc0c39]">
-                ${product.price.toLocaleString()}
+                ₹{product.price.toLocaleString()}
               </span>
               {product.originalPrice && (
                 <span className="text-xs text-[#565959] line-through">
-                  ${product.originalPrice.toLocaleString()}
+                  ₹{product.originalPrice.toLocaleString()}
                 </span>
               )}
             </div>

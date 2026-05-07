@@ -58,7 +58,7 @@ export default function AboutPage() {
                 { icon: Award, title: 'Curated Selection', desc: 'Hand-picked products from trusted global brands' },
                 { icon: CheckCircle, title: 'Quality Guaranteed', desc: '30-day money-back guarantee on all purchases' },
                 { icon: Users, title: 'Expert Support', desc: '24/7 customer support from tech enthusiasts' },
-                { icon: Globe, title: 'Fast Shipping', desc: 'Free worldwide shipping on orders over $50' },
+                { icon: Globe, title: 'Fast Shipping', desc: 'Free worldwide shipping on orders over ₹4,000' },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="bg-white border border-[#ddd] rounded p-5 hover:border-[#FF9900] transition-colors">
                   <div className="p-2.5 rounded bg-[#FF9900]/10 w-fit mb-3">

@@ -213,7 +213,7 @@ export default function CheckoutPage() {
                   <h3 className="font-bold text-[#0f1111]">Order Summary</h3>
                   <div className="flex justify-between text-[#565959]">
                     <span>Items ({items.reduce((s, i) => s + i.quantity, 0)})</span>
-                    <span>${totalPrice.toLocaleString()}</span>
+                    <span>₹{totalPrice.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-[#565959]">
                     <span>Shipping</span>
@@ -221,11 +221,11 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-[#565959]">
                     <span>Estimated tax</span>
-                    <span>${tax.toFixed(2)}</span>
+                    <span>₹{tax.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-bold text-[#cc0c39] text-lg border-t border-[#e7e7e7] pt-2">
                     <span>Order total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>₹{total.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -247,7 +247,7 @@ export default function CheckoutPage() {
                         <p className="text-xs text-[#565959]">Qty: {item.quantity}</p>
                       </div>
                       <p className="text-xs font-semibold flex-shrink-0">
-                        ${(item.price * item.quantity).toLocaleString()}
+                        ₹{(item.price * item.quantity).toLocaleString()}
                       </p>
                     </div>
                   ))}

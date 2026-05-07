@@ -123,12 +123,12 @@ export default function Header() {
                   <div className="py-2">
                     <p className="px-4 py-1 text-xs font-bold text-[#0f1111] uppercase">Your Account</p>
                     {isAuthenticated && (
-                      <Link href="/account" className="block px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]">
+                      <Link href="/account/orders" className="block px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]">
                         Your Orders
                       </Link>
                     )}
                     {isAuthenticated && (
-                      <Link href="/account#wishlist" className="block px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]">
+                      <Link href="/account/wishlist" className="block px-4 py-1.5 text-sm text-[#0f1111] hover:bg-[#f0f2f2]">
                         Your Wishlist {wishCount > 0 && <span className="ml-1 text-xs text-[#FF9900] font-bold">({wishCount})</span>}
                       </Link>
                     )}
@@ -156,7 +156,7 @@ export default function Header() {
 
             {/* Wishlist icon (logged-in only) */}
             {isAuthenticated && (
-              <Link href="/account#wishlist" className="hidden md:flex items-end gap-1 border border-transparent hover:border-white rounded px-2 py-1 transition-colors flex-shrink-0 relative">
+              <Link href="/account/wishlist" className="hidden md:flex items-end gap-1 border border-transparent hover:border-white rounded px-2 py-1 transition-colors flex-shrink-0 relative">
                 <Heart className="w-6 h-6 text-white" />
                 {wishCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-[#FF9900] text-[#131921] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">

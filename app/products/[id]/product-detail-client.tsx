@@ -137,11 +137,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 )}
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span className="text-3xl font-semibold text-[#cc0c39]">
-                    ${product.price.toLocaleString()}
+                    ₹{product.price.toLocaleString()}
                   </span>
                   {product.originalPrice && (
                     <span className="text-sm text-[#565959]">
-                      List: <span className="line-through">${product.originalPrice.toLocaleString()}</span>
+                      List: <span className="line-through">₹{product.originalPrice.toLocaleString()}</span>
                     </span>
                   )}
                 </div>

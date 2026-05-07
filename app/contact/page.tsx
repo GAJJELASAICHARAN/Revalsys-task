@@ -83,7 +83,7 @@ export default function ContactPage() {
                 { q: 'Where is my order?', a: 'Track your order in My Account → Orders.' },
                 { q: 'How do I return an item?', a: 'Start a return from My Account within 30 days.' },
                 { q: 'What payment methods do you accept?', a: 'Visa, Mastercard, Amex, PayPal, and more.' },
-                { q: 'Is free shipping available?', a: 'Yes — free on all orders over $50.' },
+                { q: 'Is free shipping available?', a: 'Yes — free on all orders over ₹4,000.' },
                 { q: 'Can I change my order?', a: 'Contact us within 1 hour of placing the order.' },
                 { q: 'How secure is my payment?', a: 'All transactions use 256-bit SSL encryption.' },
               ].map(({ q, a }) => (
